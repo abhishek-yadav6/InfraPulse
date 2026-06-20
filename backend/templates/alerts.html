@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InfraPulse - Alerts</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+
+        body {
+            background: #001a44;
+            color: white;
+            font-family: Segoe UI, sans-serif;
+        }
+
+        .sidebar {
+            position: fixed;
+            width: 180px;
+            height: 100vh;
+            background: #031634;
+            padding-top: 20px;
+        }
+
+        .sidebar h2 {
+            color: #2f80ff;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .sidebar a {
+            display: block;
+            color: white;
+            text-decoration: none;
+            padding: 12px 20px;
+        }
+
+        .sidebar a:hover {
+            background: #0d2c66;
+        }
+
+        .main {
+            margin-left: 180px;
+            padding: 20px;
+        }
+
+        .card-panel {
+            background: #162d5c;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .critical {
+            background: #dc3545;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 12px;
+        }
+
+        .online {
+            background: #198754;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 12px;
+        }
+
+        .table-dark {
+            background: #1f1f1f;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <div class="sidebar">
+
+        <h2>⚡ InfraPulse</h2>
+
+        <a href="/">Dashboard</a>
+        <a href="/servers">Servers</a>
+        <a href="/monitoring">Monitoring</a>
+        <a href="/alerts">Alerts</a>
+        <a href="/reports">Reports</a>
+        <a href="/settings">Settings</a>
+
+    </div>
+
+    <div class="main">
+
+        <div class="card-panel">
+
+            <h1>🚨 Alert History</h1>
+            <p>Server Status Change Events</p>
+
+        </div>
+
+        <div class="card-panel">
+
+            <h4>Total Alerts: {{ alerts|length }}</h4>
+
+            <table class="table table-dark table-striped">
+
+                <thead>
+
+                    <tr>
+                        <th>ID</th>
+                        <th>Server</th>
+                        <th>Old Status</th>
+                        <th>New Status</th>
+                        <th>Event Time</th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% for alert in alerts %}
+
+                    <tr>
+
+                        <td>{{ alert[0] }}</td>
+
+                        <td>{{ alert[2] }}</td>
+
+                        <td>
+                            {% if alert[3] == "Critical" %}
+                                <span class="critical">
+                                    {{ alert[3] }}
+                                </span>
+                            {% else %}
+                                <span class="online">
+                                    {{ alert[3] }}
+                                </span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if alert[4] == "Critical" %}
+                                <span class="critical">
+                                    {{ alert[4] }}
+                                </span>
+                            {% else %}
+                                <span class="online">
+                                    {{ alert[4] }}
+                                </span>
+                            {% endif %}
+                        </td>
+
+                        <td>{{ alert[5] }}</td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</body>
+</html>

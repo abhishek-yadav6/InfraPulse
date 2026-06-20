@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InfraPulse Enterprise Monitor</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<link rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+    body {
+        background: #071226;
+        color: white;
+        overflow-x: hidden;
+    }
+
+    .sidebar {
+        height: 100vh;
+        background: #0b1730;
+        padding: 20px;
+        position: fixed;
+        width: 250px;
+        border-right: 1px solid rgba(255,255,255,.08);
+    }
+
+    .main-content {
+        margin-left: 250px;
+        padding: 25px;
+    }
+
+    .logo {
+        font-size: 2rem;
+        font-weight: bold;
+    }
+
+    .logo span {
+        color: #3b82f6;
+    }
+
+    .nav-link {
+        color: #cbd5e1;
+        padding: 12px;
+        border-radius: 10px;
+        margin-bottom: 8px;
+    }
+
+    .nav-link:hover {
+        background: rgba(59,130,246,.15);
+        color: white;
+    }
+
+    .topbar {
+        background: #0b1730;
+        padding: 15px;
+        border-radius: 15px;
+        margin-bottom: 25px;
+    }
+
+    .stat-card {
+        border-radius: 18px;
+        padding: 20px;
+        color: white;
+        margin-bottom: 20px;
+    }
+
+    .total-card {
+        background: linear-gradient(135deg,#2563eb,#1e40af);
+    }
+
+    .healthy-card {
+        background: linear-gradient(135deg,#16a34a,#166534);
+    }
+
+    .warning-card {
+        background: linear-gradient(135deg,#eab308,#ca8a04);
+    }
+
+    .critical-card {
+        background: linear-gradient(135deg,#ef4444,#b91c1c);
+    }
+
+    .card-panel {
+        background: #13213d;
+        border-radius: 18px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+
+    .clock {
+        font-size: .9rem;
+        color: #94a3b8;
+    }
+
+    footer {
+        color: #94a3b8;
+        margin-top: 30px;
+        text-align: center;
+    }
+</style>
+
+</head>
+
+<body>
+
+<div class="sidebar">
+
+    <div class="logo">
+         <span>InfraPulse</span>
+    </div>
+
+    <hr>
+
+    <ul class="nav flex-column">
+
+        <li>
+            <a class="nav-link" href="/">
+                <i class="bi bi-speedometer2"></i> Dashboard
+            </a>
+        </li>
+
+        <li>
+            <a class="nav-link" href="/servers">
+                <i class="bi bi-server"></i> Servers
+            </a>
+        </li>
+
+        <li>
+            <a class="nav-link" href="/monitoring">
+                <i class="bi bi-activity"></i> Monitoring
+            </a>
+        </li>
+
+        <li>
+            <a class="nav-link" href="/alerts">
+                <i class="bi bi-bell"></i> Alerts
+            </a>
+        </li>
+
+        <li>
+            <a class="nav-link" href="/reports">
+                <i class="bi bi-file-earmark-bar-graph"></i> Reports
+            </a>
+        </li>
+
+        <li>
+            <a class="nav-link" href="/settings">
+                <i class="bi bi-gear"></i> Settings
+            </a>
+        </li>
+
+    </ul>
+
+</div>
+
+<div class="main-content">
+    
+</h1>
+
+    <div class="topbar d-flex justify-content-between align-items-center">
+
+        <div>
+            <h3>⚡ InfraPulse Enterprise Monitor</h3>
+            <small class="text-secondary">
+                Cloud-Based Infrastructure Monitoring Platform
+            </small>
+        </div>
+
+        <div class="text-end">
+            <div id="clock" class="clock"></div>
+        </div>
+
+    </div>
+
+    <div class="row">
+
+        <div class="col-md-3">
+            <div class="stat-card total-card">
+                <h6><i class="bi bi-server"></i> Total Servers</h6>
+                <h1>{{ total_servers }}</h1>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="stat-card healthy-card">
+                <h6><i class="bi bi-check-circle-fill"></i> Healthy</h6>
+                <h1>{{ online_servers }}</h1>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="stat-card warning-card">
+                <h6><i class="bi bi-exclamation-triangle-fill"></i> Warning</h6>
+                <h1>{{ warning_servers }}</h1>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="stat-card critical-card">
+                <h6><i class="bi bi-x-octagon-fill"></i> Critical</h6>
+                <h1>{{ critical_servers }}</h1>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="row">
+
+        <div class="col-md-6">
+            <div class="card-panel">
+                <h5>CPU Usage</h5>
+                <canvas id="cpuChart" style="max-height:300px;"></canvas>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card-panel">
+                <h5>Memory Usage</h5>
+                <canvas id="memoryChart" style="max-height:300px;"></canvas>
+            </div>
+        </div>
+
+    </div>
+<div class="row">
+
+    <div class="col-md-4">
+        <div class="stat-card total-card">
+            <h6><i class="bi bi-cpu-fill"></i> CPU Usage</h6>
+            <h2>{{ avg_cpu }}%</h2>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="stat-card healthy-card">
+            <h6><i class="bi bi-memory"></i> Memory Usage</h6>
+            <h2>{{ avg_memory }}%</h2>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="stat-card warning-card">
+            <h6><i class="bi bi-hdd-fill"></i> Disk Usage</h6>
+            <h2>{{ avg_disk }}%</h2>
+        </div>
+    </div>
+
+</div>
+    <div class="card-panel mt-4">
+
+    <h5>
+        <i class="bi bi-bell-fill"></i>
+        Recent Alerts
+    </h5>
+
+    <table class="table table-dark table-hover mt-3">
+
+        <thead>
+            <tr>
+               <th>ID</th>
+                    <th>Hostname</th>
+                    <th>Old Status</th>
+                    <th>New Status</th>
+                    <th>Event Time</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            {% for alert in alerts %}
+
+            <tr>
+                    <td>{{ alert.id }}</td>
+                    <td>{{ alert.hostname }}</td>
+                    <td>{{ alert.old_status }}</td>
+                    <td>{{ alert.new_status }}</td>
+                    <td>{{ alert.event_time }}</td>
+            </tr>
+
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</div>
+    <footer>
+        <hr>
+        InfraPulse Enterprise Monitor v1.0<br>
+        MCA Cloud Computing Project 2026
+    </footer>
+
+</div>
+
+<script>
+    setInterval(() => {
+        document.getElementById("clock").innerHTML =
+            new Date().toLocaleString();
+    }, 1000);
+
+    const avgCpu = parseFloat("{{ avg_cpu }}") || 0;
+    const avgMemory = parseFloat("{{ avg_memory }}") || 0;
+
+    new Chart(
+        document.getElementById('cpuChart'),
+        {
+            type: 'doughnut',
+            data: {
+                labels: ['Current'],
+                datasets: [{
+                    label: 'CPU %',
+                    data: [avgCpu],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100
+                    }
+                }
+            }
+        }
+    );
+
+    new Chart(
+        document.getElementById('memoryChart'),
+        {
+            type: 'doughnut',
+            data: {
+                labels: ['Current'],
+                datasets: [{
+                    label: 'Memory %',
+                    data: [avgMemory],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100
+                    }
+                }
+            }
+        }
+    );
+
+    setTimeout(function () {
+        location.reload();
+    }, 15000);
+</script>
+
+</body>
+</html>
