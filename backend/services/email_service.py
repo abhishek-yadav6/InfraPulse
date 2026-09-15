@@ -1,14 +1,16 @@
+import os
 import smtplib
 from email.mime.text import MIMEText
 
+from dotenv import load_dotenv
+
+load_dotenv()
 
 SMTP_SERVER = "smtp.gmail.com"
 SMTP_PORT = 587
 
-SENDER_EMAIL = "abhishek290yadav@gmail.com"
-
-# Paste your App Password here
-APP_PASSWORD = "slby rpcl ctxi qtfv"
+SENDER_EMAIL = os.environ["SMTP_SENDER_EMAIL"]
+APP_PASSWORD = os.environ["SMTP_APP_PASSWORD"]
 
 
 def send_alert_email(hostname, ip_address, old_status, new_status):
